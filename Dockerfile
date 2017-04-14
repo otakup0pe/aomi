@@ -9,6 +9,8 @@ LABEL version="${VERSION}"
 ADD . /tmp/aomi
 ADD scripts/docker-entrypoint /usr/local/bin/docker-entrypoint
 
+RUN apk add gnupg --update-cache
+
 RUN cd /tmp/aomi && python setup.py install && cd /tmp && rm -rf /tmp/aomi
 
 ENTRYPOINT ["docker-entrypoint"]

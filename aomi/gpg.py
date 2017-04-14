@@ -89,7 +89,8 @@ def import_gpg_key(key):
     key_handle = os.fdopen(key_fd, 'w')
     key_handle.write(key)
     key_handle.close()
-    cmd = flatten([gnupg_bin(), gnupg_home(), "--import", key_filename])
+    cmd = flatten([gnupg_bin(), gnupg_home(),
+                   "--import", key_filename])
     # we trust mkstep to be legit
     output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)  # nosec
     msg = 'gpg: Total number processed: 1'
@@ -99,9 +100,9 @@ def import_gpg_key(key):
 def encrypt(source, dest, keys, opt):
     """Encrypts a file using the given keys"""
     recipients = [["--recipient", key.encode('ASCII')] for key in keys]
-    cmd = flatten([gnupg_bin(), "--armor", "--output", dest,
-                   gnupg_home(), passphrase_file(), recipients,
-                   "--encrypt", source])
+    cmd = flatten([gnupg_bin(), "--armor", "--trust-model", "always",
+                   "--no-tty", "--yes", "--output", dest, gnupg_home(),
+                   passphrase_file(), recipients, "--encrypt", source])
     # gpg keys are validated in filez.grok_keys
     try:
         subprocess.check_output(cmd, stderr=subprocess.STDOUT)  # nosec
@@ -115,8 +116,9 @@ def encrypt(source, dest, keys, opt):
 
 def decrypt(source, dest, opt):
     """Attempts to decrypt a file"""
-    cmd = flatten([gnupg_bin(), "--output", dest, "--decrypt",
-                   gnupg_home(), passphrase_file(), source])
+    cmd = flatten([gnupg_bin(), "--no-tty", "--output", dest,
+                   "--decrypt", gnupg_home(), passphrase_file(),
+                   source])
     # we confirm the source file exists in filez.thaw
     try:
         subprocess.check_output(cmd, stderr=subprocess.STDOUT)  # nosec

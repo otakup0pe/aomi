@@ -7,8 +7,8 @@ import aomi.exceptions
 from aomi.helpers import hard_path, log, \
     warning, merge_dicts, cli_hash, random_word
 import aomi.validation
-from aomi.error import output as error_output
 from aomi.validation import sanitize_mount
+from aomi.error import output as error_output
 from aomi.template import render, load_var_files
 from aomi.vault import app_id_name
 from aomi.util import validate_entry
