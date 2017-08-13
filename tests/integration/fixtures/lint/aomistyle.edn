@@ -1,0 +1,3 @@
+#aomi/secret {:path [#{s/startswith "foo"}
+                     #{s/endswith "foz"}]}
+#aomi/secret {:path [#{s/startswith "bar"}]}
