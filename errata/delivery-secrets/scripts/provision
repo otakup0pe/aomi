@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+SCRIPTDIR=$( cd "${0%/*}" && pwd)
+ROOTDIR="${SCRIPTDIR%/*}"
+PYDIR="${ROOTDIR}/.env"
+ANSIBLEDIR="${ROOTDIR}/ansible"
+export ANSIBLE_CONFIG="${PYDIR}/ansible.cfg"
+
+if [ ! -d "$PYDIR" ] ; then
+   "${ROOTDIR}/scripts/preflight"
+fi
+. "${PYDIR}/bin/activate"
+ansible-playbook \
+    -c local -l localhost \
+    -e "ansible_dir=${ANSIBLEDIR}" \
+    -e "base_dir=${ROOTDIR}" \
+    "${ANSIBLEDIR}/aws.yml"    

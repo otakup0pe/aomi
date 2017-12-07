@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+SCRIPTDIR=$( cd "${0%/*}" && pwd)
+ROOTDIR="${SCRIPTDIR%/*}"
+PYDIR="${ROOTDIR}/.env"
+ANSIBLEDIR="${ROOTDIR}/ansible"
+ROLEDIR="${ANSIBLEDIR}/galaxy-roles"
+
+problems() {
+    >&2 echo "Error: ${*}"
+}
+
+if ! which virtualenv &> /dev/null ; then
+    pip install virtualenv || problems "Unable to install virtualenv"
+fi
+
+if [ ! -d "$PYDIR" ] ; then
+    virtualenv "$PYDIR"
+    . "${PYDIR}/bin/activate"
+    pip install -r "${ROOTDIR}/requirements.txt"
+else
+    . "${PYDIR}/bin/activate"
+    pip install -r "${ROOTDIR}/requirements.txt" --upgrade
+fi
+if [ ! -d "$ROLEDIR" ] ; then
+    ansible-galaxy -r "${ANSIBLEDIR}/rolefile.yml" -p "$ROLEDIR" install
+fi
+
+ansible-playbook \
+    -i localhost, -c local -l localhost \
+    -e "ansible_dir=${ANSIBLEDIR}" \
+    -e "root_dir=${ROOTDIR}" \
+    "${ANSIBLEDIR}/preflight.yml"

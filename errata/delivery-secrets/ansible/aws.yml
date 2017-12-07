@@ -1,0 +1,9 @@
+---
+- name: "ensure aomi aws access resources exist"
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - role: otakup0pe.blok-anan
+      cloudformation_template: "{{base_dir}}/aws/pipeline.json"
+      cloudformation_stack: "aomi-pipeline"
+      cloudformation_parameters: {}

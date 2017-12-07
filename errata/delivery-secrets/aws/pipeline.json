@@ -1,0 +1,77 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS Access for aomi tests",
+  "Resources": {
+    "aomiSmokePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "Description": "aomi access for smoke aws tests",
+        "Path": "/aomi/",
+        "ManagedPolicyName": "smoke",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:AttachUserPolicy",
+                "iam:CreateAccessKey",
+                "iam:CreateUser",
+                "iam:DeleteAccessKey",
+                "iam:DeleteUser",
+                "iam:DeleteUserPolicy",
+                "iam:DetachUserPolicy",
+                "iam:ListAccessKeys",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListGroupsForUser",
+                "iam:ListUserPolicies",
+                "iam:PutUserPolicy",
+                "iam:RemoveUserFromGroup"
+              ],
+              "Resource": [
+                { "Fn::Join": [ ":",
+                                [ "arn:aws:iam:",
+                                  {"Ref": "AWS::AccountId"},
+                                  "user/vault-user-approle-aomi-*"]]}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "aomiSmokeRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "aomi/smoke",
+        "RoleName": "aomi smoke tests",
+        "ManagedPolicyArns": [
+          {"Ref": "aomiSmokePolicy"}
+        ],
+        "AssumeRolePolicyDocument": {
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": "sts:AssumeRole",
+                "Principal": {
+                  "AWS": "arn:aws:iam::{{account_id}}:user/vault-user-{{account_id}}"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }    
+  },
+  "Outputs": {
+    "SmokeRole": {
+      "Description": "AWS Role for aomi smoke tests",
+      "Value": {"Ref": "aomiSmokeRole"}
+    },
+    "SmokePolicy": {
+      "Description": "Managed AWS policy for aomi smoke tests",
+      "Value": {"Ref": "aomiSmokePolicy"}
+    }
+  }
+}

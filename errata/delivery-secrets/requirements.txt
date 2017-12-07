@@ -1,0 +1,5 @@
+ansible
+aomi
+boto
+boto3
+botocore
